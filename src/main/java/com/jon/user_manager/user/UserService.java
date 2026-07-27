@@ -53,9 +53,6 @@ public class UserService {
     public void delete(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(userId));
-
-        System.out.println(userId + " : " + user.getId());
-
-//        userRepository.delete(user);
+        userRepository.delete(user);
     }
 }
