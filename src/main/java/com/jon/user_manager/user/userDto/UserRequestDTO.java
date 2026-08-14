@@ -14,5 +14,5 @@ public class UserRequestDTO {
     private String email;
 
     @NotBlank
-    private String photoUrl;
+    private String password;
 }

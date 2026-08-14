@@ -45,7 +45,7 @@ public class UserService {
 
         user.setUserName(userRequestDTO.getUserName());
         user.setEmail(userRequestDTO.getEmail());
-        user.setPhotoUrl(userRequestDTO.getPhotoUrl());
+        user.setPassword(userRequestDTO.getPassword());
 
         return userMapper.toDto(userRepository.save(user));
     }

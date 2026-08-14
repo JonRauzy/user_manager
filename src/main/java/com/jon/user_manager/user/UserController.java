@@ -5,11 +5,11 @@ import com.jon.user_manager.user.userDto.UserResponsedDTO;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@PathVariable Long userId) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long userId) {
         userService.delete(userId);
-        return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+        return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
     }
 }
