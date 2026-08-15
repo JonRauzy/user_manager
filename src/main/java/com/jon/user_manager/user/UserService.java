@@ -1,8 +1,9 @@
 package com.jon.user_manager.user;
 
 import com.jon.user_manager.user.userDto.UserMapper;
-import com.jon.user_manager.user.userDto.UserRequestDTO;
+import com.jon.user_manager.user.userDto.UserRegisterDTO;
 import com.jon.user_manager.user.userDto.UserResponsedDTO;
+import com.jon.user_manager.user.userDto.UserUpdateDTO;
 import com.jon.user_manager.util.exceptionHandler.ResourceNotFoundException;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
@@ -33,19 +34,18 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(id)));
     }
 
-    public UserResponsedDTO save(UserRequestDTO userRequestDTO) {
-        User user = userMapper.toEntity(userRequestDTO);
+    public UserResponsedDTO save(UserRegisterDTO userRegisterDTO) {
+        User user = userMapper.registerDtoToEntity(userRegisterDTO);
         userRepository.save(user);
         return userMapper.toDto(user);
     }
 
-    public UserResponsedDTO update(UserRequestDTO userRequestDTO, Long userId) {
+    public UserResponsedDTO update(UserUpdateDTO userUpdateDTO, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(userId));
 
-        user.setUserName(userRequestDTO.getUserName());
-        user.setEmail(userRequestDTO.getEmail());
-        user.setPassword(userRequestDTO.getPassword());
+        user.setUserName(userUpdateDTO.getUserName());
+        user.setEmail(userUpdateDTO.getEmail());
 
         return userMapper.toDto(userRepository.save(user));
     }

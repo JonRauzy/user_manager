@@ -1,7 +1,8 @@
 package com.jon.user_manager.user;
 
-import com.jon.user_manager.user.userDto.UserRequestDTO;
+import com.jon.user_manager.user.userDto.UserRegisterDTO;
 import com.jon.user_manager.user.userDto.UserResponsedDTO;
+import com.jon.user_manager.user.userDto.UserUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +30,13 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponsedDTO save(@Valid @RequestBody UserRequestDTO userRequestDTO) {
-        return userService.save(userRequestDTO);
+    public UserResponsedDTO save(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        return userService.save(userRegisterDTO);
     }
 
     @PutMapping("/{userId}")
-    public UserResponsedDTO update(@Valid @RequestBody UserRequestDTO userRequestDTO, @PathVariable Long userId) {
-        return userService.update(userRequestDTO, userId);
+    public UserResponsedDTO update(@Valid @RequestBody UserUpdateDTO userUpdateDTO, @PathVariable Long userId) {
+        return userService.update(userUpdateDTO, userId);
     }
 
     @DeleteMapping("/{userId}")
