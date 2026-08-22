@@ -1,5 +1,6 @@
 package com.jon.user_manager.user;
 
+import com.jon.user_manager.auth.authDto.LoginRequestDTO;
 import com.jon.user_manager.user.userDto.UserRegisterDTO;
 import com.jon.user_manager.user.userDto.UserResponsedDTO;
 import com.jon.user_manager.user.userDto.UserUpdateDTO;
@@ -29,9 +30,14 @@ public class UserController {
         return userService.findById(userId);
     }
 
+    @GetMapping("/with-email")
+    public UserResponsedDTO findByEmail(@Valid @RequestBody LoginRequestDTO loginRequestDTO){
+        return userService.findByEmail(loginRequestDTO.getEmail());
+    }
+
     @PostMapping
-    public UserResponsedDTO save(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
-        return userService.save(userRegisterDTO);
+    public UserResponsedDTO register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+        return userService.register(userRegisterDTO);
     }
 
     @PutMapping("/{userId}")

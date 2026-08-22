@@ -4,23 +4,23 @@ import com.jon.user_manager.user.userDto.UserMapper;
 import com.jon.user_manager.user.userDto.UserRegisterDTO;
 import com.jon.user_manager.user.userDto.UserResponsedDTO;
 import com.jon.user_manager.user.userDto.UserUpdateDTO;
+import com.jon.user_manager.util.exceptionHandler.ResourceExist;
 import com.jon.user_manager.util.exceptionHandler.ResourceNotFoundException;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @Getter
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponsedDTO> findAll() {
         return userRepository.findAll()
@@ -34,9 +34,17 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(id)));
     }
 
-    public UserResponsedDTO save(UserRegisterDTO userRegisterDTO) {
-        User user = userMapper.registerDtoToEntity(userRegisterDTO);
-        userRepository.save(user);
+    public UserResponsedDTO findByEmail(String userEmail) {
+        return userMapper.toDto(userRepository.findByEmail(userEmail)
+                .orElseThrow(ResourceNotFoundException::new));
+    }
+
+    public UserResponsedDTO register(UserRegisterDTO userRegisterDTO) {
+        if(userRepository.existsByEmail(userRegisterDTO.getEmail())) {
+            throw new ResourceExist(User.class);
+        }
+        userRegisterDTO.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
+        User user = userRepository.save(userMapper.registerDtoToEntity(userRegisterDTO));
         return userMapper.toDto(user);
     }
 

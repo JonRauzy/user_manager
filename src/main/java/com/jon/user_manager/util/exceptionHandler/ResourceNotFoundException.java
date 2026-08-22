@@ -10,6 +10,6 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     public ResourceNotFoundException(){
-        super("This user doesn't is not found");
+        super("This user doesn't exist");
     }
 }

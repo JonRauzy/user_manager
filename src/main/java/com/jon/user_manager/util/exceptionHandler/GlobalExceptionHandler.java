@@ -43,4 +43,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleWrongRessource(WrongResource ex) {
         return buildErrorResponse(ex, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(ResourceExist.class)
+    public ResponseEntity<ErrorResponse> handleWrongRessource(ResourceExist ex) {
+        return buildErrorResponse(ex, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadToken.class)
+    public ResponseEntity<ErrorResponse> handleBadToken(BadToken ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
+    }
 }
