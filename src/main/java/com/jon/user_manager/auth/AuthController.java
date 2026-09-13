@@ -2,56 +2,37 @@ package com.jon.user_manager.auth;
 
 import com.jon.user_manager.auth.authDto.LoginRequestDTO;
 import com.jon.user_manager.auth.authDto.LoginResponseDTO;
-import com.jon.user_manager.user.User;
-import com.jon.user_manager.user.UserRepository;
-import com.jon.user_manager.util.exceptionHandler.ResourceNotFoundException;
-import com.jon.user_manager.util.security.JwtLogoutHandler;
-import com.jon.user_manager.util.security.JwtUtils;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.jon.user_manager.auth.authDto.RefreshTokenRequest;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Getter
 public class AuthController {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
-    private final JwtLogoutHandler logoutHandler;
+
+    private final AuthService authService;
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refreshAccessToken(@RequestBody RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+        LoginResponseDTO response = authService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/login")
-    public LoginResponseDTO login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        User user = userRepository.findByEmail(loginRequestDTO.getEmail())
-                .orElseThrow(ResourceNotFoundException::new);
-
-        if(!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())){
-            throw new RuntimeException("Nope"); // TODO : exception
-        }
-
-        Map<String, Object> claims = Map.of(
-                "userId", user.getId(),
-                "role", "USER"
-        );
-
-        String token = jwtUtils.generateToken(user.getEmail(), claims);
-        return new LoginResponseDTO(token);
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        LoginResponseDTO response = authService.login(loginRequestDTO);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        logoutHandler.logout(request, response, null);
+    public ResponseEntity<String> logout() {
         return ResponseEntity.ok("Logout successfull");
     }
 }

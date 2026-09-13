@@ -20,13 +20,11 @@ public class JwtLogoutHandler implements LogoutHandler {
             @NonNull HttpServletResponse response,
             Authentication authentication
     ) {
-        // 1. Récupère le token du header Authorization
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            blacklistedTokens.add(token); // Ajoute à la blacklist
+            blacklistedTokens.add(token); 
         }
-        // 2. Réponse vide (le frontend doit supprimer le token)
         response.setStatus(HttpServletResponse.SC_OK);
     }
 

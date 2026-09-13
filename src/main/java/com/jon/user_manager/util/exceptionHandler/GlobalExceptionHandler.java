@@ -2,6 +2,7 @@ package com.jon.user_manager.util.exceptionHandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -52,5 +53,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadToken.class)
     public ResponseEntity<ErrorResponse> handleBadToken(BadToken ex) {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex) {
+        return buildErrorResponse(ex, HttpStatus.UNAUTHORIZED);
     }
 }

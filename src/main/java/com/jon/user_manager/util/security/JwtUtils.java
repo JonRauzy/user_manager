@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
@@ -14,25 +15,22 @@ import java.util.Map;
 
 @Component
 public class JwtUtils {
-    //decoder
-    //encoder
-    //generate token
-    //verify token
-    //parse
-    //read the token and get info about it
     private final Key key;
     private final long expiration;
 
-    JwtUtils(@Value("${app.jwt.secret}")String secret, @Value("${app.jwt.expiration}") long expiration) {
+    @Value("${app.jwt.secret}")
+    private String secretKey;
+
+    JwtUtils(@Value("${app.jwt.secret}")String secret, @Value("${app.jwt.refresh-expiration}") long expiration) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expiration = expiration;
     }
 
     private Jws<Claims> parse(String token) {
         return Jwts.parser()
-                .setSigningKey(key)
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token);
+                .parseSignedClaims(token);
     }
 
     public String generateToken(String subject, Map<String, Object> claims) {
@@ -40,22 +38,28 @@ public class JwtUtils {
         Date expire = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .setClaims(claims)      //provide the payload of the JWT
-                .setSubject(subject)    // it is used to identify the user
-                .setIssuedAt(now)       //set the issued at
-                .setExpiration(expire)  //set the expiration
-                .signWith(key)          //TODO decode when we set the key with base64 encoding
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
     public boolean isValid(String token) {
-        Date tokenExpiration = parse(token).getBody().getExpiration();
+        Date tokenExpiration = parse(token).getPayload().getExpiration();
         return tokenExpiration.after(new Date());
     }
 
     public String getSubject(String token) {
-        Claims body = parse(token).getBody();
+        Claims body = parse(token).getPayload();
         //TODO check it in the debugger
         return body.getSubject();
     }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBites = secretKey.getBytes();
+        return Keys.hmacShaKeyFor(keyBites);
+    }
+
 }
