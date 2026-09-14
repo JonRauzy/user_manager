@@ -2,7 +2,6 @@ package com.jon.user_manager.util.filters;
 
 import com.jon.user_manager.user.User;
 import com.jon.user_manager.user.UserRepository;
-import com.jon.user_manager.util.security.JwtLogoutHandler;
 import com.jon.user_manager.util.security.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,7 +24,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // implement
 
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
-    private final JwtLogoutHandler jwtLogoutHandler;
 
     @Override
     public void doFilterInternal(
@@ -34,7 +32,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // implement
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if (request.getRequestURI().contains("/api/v1/auth/login") || request.getRequestURI().contains("/api/v1/auth/logout")) {
+        if (
+                request.getRequestURI().equals("/api/v1/auth/login") ||
+                request.getRequestURI().equals("/api/v1/auth/logout")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -46,12 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // implement
         if(header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
 
-            if(jwtUtils.isValid(token) && !jwtLogoutHandler.isTokenBlacklisted(token)) {
+            if(jwtUtils.isValid(token)) {
                 String email = jwtUtils.getSubject(token);
                 User user = userRepository.findByEmail(email).orElse(null);
                 if(user != null) {
-                    // TODO Defines ROLE for User entity
-                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority("USER");
+                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
 
                     UsernamePasswordAuthenticationToken authenticationToken
                             = new UsernamePasswordAuthenticationToken(

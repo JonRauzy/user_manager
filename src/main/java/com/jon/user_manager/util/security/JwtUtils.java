@@ -77,10 +77,19 @@ public class JwtUtils {
                 .compact();
     }
 
+    public void saveRefreshToken(User user, String token) {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setToken(token);
+        refreshToken.setExpiresAt(Instant.now().plusMillis(refreshExpiration)); // 7 jours
+        refreshToken.setRevoked(false);
+        refreshTokenRepository.save(refreshToken);
+    }
+
     private Map<String, Object> getClaims(User user){
         return Map.of(
                 "userId", user.getId(),
-                "role", "USER" //TODO create + use ROLE
+                "role", user.getRole()
         );
     }
 
