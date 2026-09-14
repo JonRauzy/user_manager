@@ -19,9 +19,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refreshAccessToken(@RequestBody RefreshTokenRequest request) {
-        String refreshToken = request.getRefreshToken();
-        LoginResponseDTO response = authService.refreshAccessToken(refreshToken);
+    public ResponseEntity<LoginResponseDTO> refreshAccessToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        LoginResponseDTO response = authService.refreshAccessToken(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
@@ -32,7 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        authService.logout(refreshTokenRequest.getRefreshToken());
         return ResponseEntity.ok("Logout successfull");
     }
 }

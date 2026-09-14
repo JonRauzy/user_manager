@@ -21,11 +21,12 @@ public class RefreshToken {
     private User user;
 
     @Column(nullable = false, unique = true)
-    private String tokenHash; // Haché en BCrypt
+    private String token;
 
     @Column(nullable = false)
     private Instant expiresAt;
 
     @Column(name = "is_revoked", nullable = false)
     private boolean revoked = false;
+
 }
